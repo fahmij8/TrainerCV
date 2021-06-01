@@ -1,6 +1,8 @@
+# =========== Module 1, Step 1 : Dataset Taking =========== #
 import cv2
 import os, shutil, time
 
+# Directory Initialization
 print("[!] Inititalizing Directory")
 if(os.path.exists("dataset/myface")) :
     shutil.rmtree("dataset")
@@ -18,9 +20,7 @@ face_classifier = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 def face_extractor(img):
     # Function detects faces and returns the cropped face
     # If no face detected, it returns nothing
-
     faces = face_classifier.detectMultiScale(img, 1.3, 5)
-    
     if faces is ():
         return None
     
@@ -34,11 +34,15 @@ def face_extractor(img):
 
 # Initialize Webcam
 print("[!] Initializing webcam") 
-cap = cv2.VideoCapture("http://camera-cv-web.herokuapp.com/video_feed") #EDIT HERE!
+
+############# EDIT HERE!
+cap = cv2.VideoCapture("#EDIT HERE#") # CHANGE WITH YOUR CAM URL
+############# 
+
 count = 0
 time.sleep(3)
 
-# Collect 100 samples of your face from webcam input
+# Collect 20 samples of your face from webcam input
 print("[!] Taking samples") 
 while True:
     ret, frame = cap.read()
@@ -58,7 +62,7 @@ while True:
         print("Face not found")
         pass
 
-    if cv2.waitKey(1) == 13 or count == 20: #13 is the Enter Key
+    if cv2.waitKey(1) == 13 or count == 20: #Break with CTRL + C or Finish take dataset with 20 sample
         break
         
 cap.release()
