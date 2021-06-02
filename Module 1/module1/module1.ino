@@ -7,8 +7,8 @@
 #define deviceName "" // Antares Device Name
 /////////////////////////////
 
-const char* ssid = "BigYellow";
-const char* password = "thethepooh71";
+const char* ssid = "";
+const char* password = "";
 
 AntaresESP32HTTP antares(ACCESSKEY);
 
