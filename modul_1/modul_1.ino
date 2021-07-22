@@ -5,7 +5,7 @@
 DHT dht(2, DHT11); //Pin, Jenis DHT
 
 //init lcd pins interface
-LiquidCrystal lcd (12, 11, 9, 8, 7, 6);
+LiquidCrystal lcd (13, 12, 9, 8, 7, 6);
 
 //variabel dht11
 float kelembaban;
