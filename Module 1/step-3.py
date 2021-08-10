@@ -1,79 +1,32 @@
 # =========== Module 1, Step 3 : Model Testing =========== #
-import cv2, json, sys, time
+import cv2, sys
 import tensorflow as tf
 import numpy as np
+import utilities_modul as util
 sys.path.append("/usr/grading")
 import grad
 from PIL import Image
-from threading import Thread
-
-# Face Extractor functions
-def face_extractor(img):
-    # Function detects faces and returns the cropped face
-    # If no face detected, it returns nothing
-    faces = face_cascade.detectMultiScale(img, 1.3, 5)
-    
-    if faces is ():
-        return None
-
-    # Give bounding box to any detected face
-    for (x,y,w,h) in faces:
-        cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,255),2)
-        cropped_face = img[y:y+h, x:x+w]
-
-    return cropped_face
-
-# Threading Capture
-class ThreadedCamera(object):
-    def __init__(self, src=0):
-        self.capture = cv2.VideoCapture(src)
-        self.capture.set(cv2.CAP_PROP_BUFFERSIZE, 2)
-        self.status = False
-        # FPS = 1/X
-        # X = desired FPS
-        self.FPS = 1/30
-        self.FPS_MS = int(self.FPS * 1000)
-
-        # Start frame retrieval thread
-        self.thread = Thread(target=self.update, args=())
-        self.thread.daemon = True
-        self.thread.start()
-
-    def update(self):
-        while True:
-            if self.capture.isOpened():
-                (self.status, self.frame) = self.capture.read()
-            time.sleep(self.FPS)
-
-    def show_frame(self):
-        if self.status:
-            return self.frame
-        return None 
 
 if __name__ == '__main__':
     # Read Credential
-    f = open("trainer-userdata.json")
-    data = json.load(f)
-    usermail = data["email"]
+    usermail = util.init_data("email")
 
     # Load Models
     model = tf.keras.models.load_model('model_module-1.h5')
 
     # Load HAAR face classifier
-    face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+    face_classifier = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
     # Initialize Webcam
-    print("[!] Initializing webcam") 
-
-    ############# EDIT HERE!
-    cap = ThreadedCamera("") # CHANGE WITH YOUR CAM URL
-    ############# 
+    cap = util.init_camera(util.init_data("urlCamera"))
+    detectedTimes = 15
+    flagGrading = False
 
     # Testing Model
     while True:
         try:
-            frame = cap.show_frame()
-            face=face_extractor(frame)
+            ret, frame = cap.read()
+            face=util.face_extractor_boundaries(frame, face_classifier)
             # If Webcam detecting face
             if type(face) is np.ndarray:
                 # Preprocess Image
@@ -82,14 +35,22 @@ if __name__ == '__main__':
                 img_array = np.array(im)
                 img_array = np.expand_dims(img_array, axis=0)
                 pred = model.predict(img_array)
-
+                confidence = int(pred[0][0] * 100)
+                print(confidence)
                 # Image Labeling
-                # If prediction confidence > 0.5 your face is detected  
-                if(pred[0][0]>0.5):
-                    ############# EDIT HERE!
-                    cv2.putText(frame,"#EDIT HERE#", (50, 50), cv2.FONT_HERSHEY_COMPLEX, 1, (0,255,0), 2) #PUT YOUR NAME HERE
-                    #############
-                    flagGrading = False
+                # If prediction confidence > 0.5 your face is detected 
+                if(confidence > 50):
+                    detectedTimes -= 1 
+                    label = f"Face : ({confidence}%)"
+                    cv2.putText(frame,label, (50, 50), cv2.FONT_HERSHEY_COMPLEX, 1, (0,255,0), 2)
+                else:
+                    label = f"Emtpy : ({confidence}%)"
+                    cv2.putText(frame,label, (50, 50), cv2.FONT_HERSHEY_COMPLEX, 1, (0,255,255), 2)
+
+                if(detectedTimes == 0 and flagGrading == False):
+                    cv2.destroyAllWindows()
+                    grad.doGrade(usermail, 1, 3)
+                    break
             # Else, webcam not detecting any images
             else:
                 cv2.putText(frame,"Empty", (50, 50), cv2.FONT_HERSHEY_COMPLEX, 1, (0,255,0), 2)
@@ -106,7 +67,3 @@ if __name__ == '__main__':
 
     cv2.destroyAllWindows()
     print("[!] Testing Model Complete")
-    if(flagGrading == False):
-        grad.doGrade(usermail, 1, 3)
-    else:
-        print("[!] You're not graded due to an error")

@@ -1,82 +1,26 @@
 # =========== Module 1, Step 1 : Dataset Taking (Your Face Sample) =========== #
 import cv2
-import os, shutil, time
-from threading import Thread
-
-# Face Extractor functions
-def face_extractor(img):
-    # Function detects faces and returns the cropped face
-    # If no face detected, it returns nothing
-    faces = face_classifier.detectMultiScale(img, 1.3, 5)
-    if faces is ():
-        return None
-    
-    # Crop all faces found
-    for (x,y,w,h) in faces:
-        x=x-10
-        y=y-10
-        cropped_face = img[y:y+h+50, x:x+w+50]
-
-    return cropped_face
-
-# Threading Capture
-class ThreadedCamera(object):
-    def __init__(self, src=0):
-        self.capture = cv2.VideoCapture(src)
-        self.capture.set(cv2.CAP_PROP_BUFFERSIZE, 2)
-        self.status = False
-        # FPS = 1/X
-        # X = desired FPS
-        self.FPS = 1/30
-        self.FPS_MS = int(self.FPS * 1000)
-
-        # Start frame retrieval thread
-        self.thread = Thread(target=self.update, args=())
-        self.thread.daemon = True
-        self.thread.start()
-
-    def update(self):
-        while True:
-            if self.capture.isOpened():
-                (self.status, self.frame) = self.capture.read()
-            time.sleep(self.FPS)
-
-    def show_frame(self):
-        if self.status:
-            return self.frame
-        return None 
+import utilities_modul as util
 
 if __name__ == '__main__':
-    # Directory Initialization
-    print("[!] Inititalizing Directory")
-    if(os.path.exists("dataset/myface")) :
-        shutil.rmtree("dataset")
-        os.makedirs("dataset/myface")
-        print("[!] Old Directory deleted, creating a new one")
-    else :
-        os.makedirs("dataset/myface") 
-        print("[!] Creating new directory") 
+    # Initialize Directory
+    util.init_directory(1)
 
     # Load HAAR face classifier
     face_classifier = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
     # Initialize Webcam
-    print("[!] Initializing webcam") 
-
-    ############# EDIT HERE!
-    cap = ThreadedCamera("") # CHANGE WITH YOUR CAM URL
-    ############# 
-
+    cap = util.init_camera(util.init_data("urlCamera"))
     count = 0
 
     # Collect 20 samples of your face from webcam input
     print("[!] Taking samples") 
     while True:
         try:
-            frame = cap.show_frame()
-            if face_extractor(frame) is not None:
+            ret, frame = cap.read()
+            if util.face_extractor(frame, face_classifier) is not None:
                 count += 1
-                face = cv2.resize(face_extractor(frame), (400, 400))
+                face = cv2.resize(util.face_extractor(frame, face_classifier), (400, 400))
 
                 # Save file in specified directory with unique name
                 file_name_path = './dataset/myface/' + str(count) + '.jpg'
@@ -90,7 +34,7 @@ if __name__ == '__main__':
                 print("Face not found")
                 pass
 
-            if cv2.waitKey(1) == 13 or count == 20: #Break with CTRL + C or Finish take dataset with 20 sample
+            if cv2.waitKey(1) == 13 or count == 20: 
                 break
         except:
             print("[!] Change your webcam URL if you see this many times.")
