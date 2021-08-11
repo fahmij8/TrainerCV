@@ -1,4 +1,4 @@
-# =========== Module 1, Step 1 : Dataset Taking (Your Face Sample) =========== #
+# =========== Module 2, Step 1.1 : Dataset Taking (Your Face Sample) =========== #
 import cv2
 import utilities_modul as util
 
@@ -23,7 +23,7 @@ if __name__ == '__main__':
                 face = cv2.resize(util.face_extractor(frame, face_classifier), (400, 400))
 
                 # Save file in specified directory with unique name
-                file_name_path = './dataset/myface/' + str(count) + '.jpg'
+                file_name_path = './dataset/firstface/' + str(count) + '.jpg'
                 cv2.imwrite(file_name_path, face)
 
                 # Put count on images and display live count

@@ -1,17 +1,13 @@
-# =========== Module 1, Step 1 Continued : Dataset Taking =========== #
+# =========== Module 2, Step 1.2 : Dataset Taking (Another Face Sample) =========== #
 import cv2
-import sys, os, shutil, time, json
 import utilities_modul as util
-sys.path.append("/usr/grading")
-import grad
 
 if __name__ == '__main__':
-    # Read Credential
-    usermail = util.init_data("email")
-    flagGraded = None
-
-    # Directory Initialization
+    # Initialize Directory
     util.init_directory(2)
+
+    # Load HAAR face classifier
+    face_classifier = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
     # Initialize Webcam
     cap = util.init_camera(util.init_data("urlCamera"))
@@ -22,32 +18,27 @@ if __name__ == '__main__':
     while True:
         try:
             ret, frame = cap.read()
-            if frame is not None:
-                empty = cv2.resize(frame, (400, 400))
+            if util.face_extractor(frame, face_classifier) is not None:
+                count += 1
+                face = cv2.resize(util.face_extractor(frame, face_classifier), (400, 400))
 
                 # Save file in specified directory with unique name
-                file_name_path = './dataset/empty/' + str(count) + '.jpg'
-                cv2.imwrite(file_name_path, empty)
-                count += 1
-                
-                # Put count on images and display live count
-                cv2.putText(empty, str(count), (50, 50), cv2.FONT_HERSHEY_COMPLEX, 1, (0,255,0), 2)
-                cv2.imshow('Dataset Taker', empty)
-                time.sleep(1)
+                file_name_path = './dataset/secondface/' + str(count) + '.jpg'
+                cv2.imwrite(file_name_path, face)
 
-                if cv2.waitKey(1) == 13: #Break with CTRL + C or Finish take dataset with 20 sample
-                    flagGraded = False
-                    break
-                elif count == 20:
-                    grad.doGrade(usermail, 1, 1)
-                    break
+                # Put count on images and display live count
+                cv2.putText(face, str(count), (50, 50), cv2.FONT_HERSHEY_COMPLEX, 1, (0,255,0), 2)
+                cv2.imshow('Dataset Taker', face)
+                
             else:
-                print("[!] Change your webcam URL if you see this many times.")
+                print("Face not found")
+                pass
+
+            if cv2.waitKey(1) == 13 or count == 20: 
+                break
         except:
             print("[!] Change your webcam URL if you see this many times.")
-            pass
+            pass    
 
     cv2.destroyAllWindows()      
     print("[!] Collecting Samples Complete")
-    if(flagGraded == False):
-        print("[!] You're not graded due to an error. Finish your dataset taking.")

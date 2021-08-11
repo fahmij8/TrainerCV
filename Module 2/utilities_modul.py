@@ -43,14 +43,23 @@ def face_extractor_boundaries(img, face_classifier):
 def init_directory(mode):
     if(mode == 1):
         print("[!] Inititalizing Directory")
-        if(os.path.exists("dataset/myface")) :
+        if(os.path.exists("dataset/firstface")) :
             shutil.rmtree("dataset")
-            os.makedirs("dataset/myface")
+            os.makedirs("dataset/firstface")
             print("[!] Old Directory deleted, creating a new one")
         else :
-            os.makedirs("dataset/myface") 
+            os.makedirs("dataset/firstface") 
             print("[!] Creating new directory")
     elif(mode == 2):
+        print("[!] Inititalizing Directory")
+        if(os.path.exists("dataset/secondface")) :
+            shutil.rmtree("dataset/secondface")
+            os.makedirs("dataset/secondface")
+            print("[!] Old Directory deleted, creating a new one")
+        else :
+            os.makedirs("dataset/secondface")
+            print("[!] Creating new directory")
+    elif(mode == 3):
         print("[!] Inititalizing Directory")
         if(os.path.exists("dataset/empty")) :
             shutil.rmtree("dataset/empty")
@@ -70,13 +79,13 @@ def init_camera(url):
 def postRequest(predict, appname, devicename, key):
     # Function to push state of LED to antares devices
     url = "https://platform.antares.id:8443/~/antares-cse/antares-id/" + appname + "/" + devicename
-    payload = "{\r\n    \"m2m:cin\": {\r\n    \"con\": \"{\\\"led\\\":" + str(predict) + "}\"\r\n    }\r\n}"
+    payload = "{\r\n    \"m2m:cin\": {\r\n    \"con\": \"{\\\"decision\\\":" + str(predict) + "}\"\r\n    }\r\n}"
     headers = {
-    'x-m2m-origin': key,
-    'content-type': "application/json;ty=4",
-    'accept': "application/json",
-    'cache-control': "no-cache",
-    'postman-token': "e10b0cdc-98bc-4459-be34-25417d5f57bd"
+        'x-m2m-origin': key,
+        'content-type': "application/json;ty=4",
+        'accept': "application/json",
+        'cache-control': "no-cache",
+        'postman-token': "e10b0cdc-98bc-4459-be34-25417d5f57bd"
     }
     response = requests.request("POST", url, data=payload, headers=headers)
     return response
