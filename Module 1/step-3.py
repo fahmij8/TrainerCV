@@ -19,7 +19,7 @@ if __name__ == '__main__':
 
     # Initialize Webcam
     cap = util.init_camera(util.init_data("urlCamera"))
-    detectedTimes = 15
+    detectedTimes = 15 #EDIT THIS IF YOU WANT TO DETECT MORE LONGER
     flagGrading = False
 
     # Testing Model

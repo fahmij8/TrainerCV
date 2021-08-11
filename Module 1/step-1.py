@@ -1,4 +1,4 @@
-# =========== Module 1, Step 1 : Dataset Taking (Your Face Sample) =========== #
+# =========== Module 1, Step 1.1 : Dataset Taking (Your Face Sample) =========== #
 import cv2
 import utilities_modul as util
 

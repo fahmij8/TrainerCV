@@ -1,6 +1,6 @@
-# =========== Module 1, Step 1 Continued : Dataset Taking =========== #
+# =========== Module 1, Step 1.2 : Dataset Taking =========== #
 import cv2
-import sys, os, shutil, time, json
+import sys, time
 import utilities_modul as util
 sys.path.append("/usr/grading")
 import grad
@@ -39,6 +39,7 @@ if __name__ == '__main__':
                     flagGraded = False
                     break
                 elif count == 20:
+                    flagGraded = True
                     grad.doGrade(usermail, 1, 1)
                     break
             else:
