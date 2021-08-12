@@ -1,5 +1,5 @@
 import cv2
-import os, shutil, json, requests
+import os, shutil, json, requests, zipfile, io
 
 # Take user data function
 def init_data(types):
@@ -8,66 +8,13 @@ def init_data(types):
     return data[types]
     
 
-# Face Extractor function
-def face_extractor(img, face_classifier):
-    # Function detects faces and returns the cropped face
-    # If no face detected, it returns nothing
-    faces = face_classifier.detectMultiScale(img, 1.3, 5)
-    if faces is ():
-        return None
-    
-    # Crop all faces found
-    for (x,y,w,h) in faces:
-        x=x-10
-        y=y-10
-        cropped_face = img[y:y+h+50, x:x+w+50]
-
-    return cropped_face
-
-# Face Extractor functions
-def face_extractor_boundaries(img, face_classifier):
-    # Function detects faces and returns the cropped face
-    # If no face detected, it returns nothing
-    faces = face_classifier.detectMultiScale(img, 1.3, 5)
-    if faces is ():
-        return img
-
-    # Give bounding box to any detected face
-    for (x,y,w,h) in faces:
-        cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,255),2)
-        cropped_face = img[y:y+h, x:x+w]
-
-    return cropped_face
-
 #Initialize Directory Function
 def init_directory(mode):
     if(mode == 1):
         print("[!] Inititalizing Directory")
         if(os.path.exists("dataset/firstface")) :
             shutil.rmtree("dataset")
-            os.makedirs("dataset/firstface")
-            print("[!] Old Directory deleted, creating a new one")
-        else :
-            os.makedirs("dataset/firstface") 
-            print("[!] Creating new directory")
-    elif(mode == 2):
-        print("[!] Inititalizing Directory")
-        if(os.path.exists("dataset/secondface")) :
-            shutil.rmtree("dataset/secondface")
-            os.makedirs("dataset/secondface")
-            print("[!] Old Directory deleted, creating a new one")
-        else :
-            os.makedirs("dataset/secondface")
-            print("[!] Creating new directory")
-    elif(mode == 3):
-        print("[!] Inititalizing Directory")
-        if(os.path.exists("dataset/empty")) :
-            shutil.rmtree("dataset/empty")
-            os.makedirs("dataset/empty")
-            print("[!] Old Directory deleted, creating a new one")
-        else :
-            os.makedirs("dataset/empty")
-            print("[!] Creating new directory")
+        
 
 # Initialize Camera Function
 def init_camera(url):
@@ -89,3 +36,12 @@ def postRequest(predict, appname, devicename, key):
     }
     response = requests.request("POST", url, data=payload, headers=headers)
     return response
+
+def prepDataset():
+        r = requests.get("https://firebasestorage.googleapis.com/v0/b/trainercv-dpte.appspot.com/o/datasets%2Fmodule-3.zip?alt=media&token=4627e779-47d3-44ff-b6d7-7d66e3fb4b65")
+        if(r.status_code == 200):
+            z = zipfile.ZipFile(io.BytesIO(r.content))
+            z.extractall()
+            return "[!] Dataset preparation success"
+        else :
+            return "[!] Dataset preparation failed, please re-run the code or contact admin for further information"
