@@ -28,7 +28,7 @@ if __name__ == '__main__':
             _, threshold = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
             contours, _ = cv2.findContours(threshold, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
             i = 0
-            # list for storing names of shapes
+            # list for storing names of shapes 
             for contour in contours:
                 # here we are ignoring first counter because 
                 # findcontour function detects whole image as shape
@@ -39,21 +39,24 @@ if __name__ == '__main__':
                 # cv2.approxPloyDP() function to approximate the shape
                 approx = cv2.approxPolyDP(
                     contour, 0.01 * cv2.arcLength(contour, True), True)
-                    
-                if len(approx) == 3 :
-                    obj = cv2.resize(roi, (150, 150))
-                    im = Image.fromarray(obj, 'RGB')
-                    img_array = np.array(im)
-                    img_array = np.expand_dims(img_array, axis=0)
-                    pred = model.predict(img_array)
-                    result = np.argmax(pred)
-                    confidence = int(pred[0][result] * 100)
-                    print(f"Triangle with color of {result} = {confidence}")    
-
-                # using drawContours() function
-                cv2.drawContours(roi, [approx], 0, (0, 0, 255), 5)
                 
-                            
+                # using drawContours() function
+                if len(approx) == 3 :
+                    for i,c in enumerate(contour):
+                        rect = cv2.boundingRect(c)
+                        x,y,w,h = rect
+                        box = cv2.rectangle(roi, (x,y), (x+w,y+h), (0,0,255), 2)
+                        cropped = roi[y: y+h, x: x+w]
+                        obj = cv2.resize(cropped, (150, 150))
+                        im = Image.fromarray(obj, 'RGB')
+                        img_array = np.array(im)
+                        img_array = np.expand_dims(img_array, axis=0)
+                        pred = model.predict(img_array)
+                        result = np.argmax(pred)
+                        confidence = int(pred[0][result] * 100)
+                        print(f"Triangle with color of {result} = {confidence}")    
+                
+                cv2.drawContours(roi, [approx], 0, (0, 0, 255), 5)
                 
             frame[100:300, 100:300] = roi
             cv2.imshow("contours",	frame)
