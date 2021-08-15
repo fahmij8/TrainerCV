@@ -26,7 +26,7 @@ def init_camera(url):
 def postRequest(predict, appname, devicename, key):
     # Function to push state of LED to antares devices
     url = "https://platform.antares.id:8443/~/antares-cse/antares-id/" + appname + "/" + devicename
-    payload = "{\r\n    \"m2m:cin\": {\r\n    \"con\": \"{\\\"decision\\\":" + str(predict) + "}\"\r\n    }\r\n}"
+    payload = "{\r\n    \"m2m:cin\": {\r\n    \"con\": \"{\\\"color\\\":" + predict + "}\"\r\n    }\r\n}"
     headers = {
         'x-m2m-origin': key,
         'content-type': "application/json;ty=4",

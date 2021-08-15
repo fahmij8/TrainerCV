@@ -10,6 +10,9 @@ from PIL import Image
 if __name__ == '__main__':
     # Read Credential
     usermail = util.init_data("email")
+    appName = util.init_data("appName")
+    deviceName = util.init_data("deviceName")
+    key = util.init_data("xm2morigin")
 
     # Load Models
     model = tf.keras.models.load_model('model_module-3.h5')
@@ -62,6 +65,7 @@ if __name__ == '__main__':
                             confidence = int(pred[0][result] * 100)
                             colors = ['black','blue','brown','green','grey','orange','red','violet','white','yellow']
                             print(f"[!]{datetime.datetime.now()} : Triangle with color of {colors[result]}, Confidence {confidence}%")
+                            util.postRequest(colors[result], appName, deviceName, key)
                             cv2.imshow("Cropped", obj)    
                 
                 cv2.drawContours(roi, [approx], -1, (0, 0, 255), 2)
