@@ -1,5 +1,5 @@
 # =========== Module 1, Step 3 : Model Testing =========== #
-import cv2, sys
+import cv2, sys, datetime
 import tensorflow as tf
 import numpy as np
 import utilities_modul as util
@@ -43,20 +43,22 @@ if __name__ == '__main__':
                 # using drawContours() function
                 if len(approx) == 3 :
                     for i,c in enumerate(contour):
-                        rect = cv2.boundingRect(c)
-                        x,y,w,h = rect
-                        box = cv2.rectangle(roi, (x,y), (x+w,y+h), (0,0,255), 2)
-                        cropped = roi[y: y+h, x: x+w]
-                        obj = cv2.resize(cropped, (150, 150))
-                        im = Image.fromarray(obj, 'RGB')
-                        img_array = np.array(im)
-                        img_array = np.expand_dims(img_array, axis=0)
-                        pred = model.predict(img_array)
-                        result = np.argmax(pred)
-                        confidence = int(pred[0][result] * 100)
-                        print(f"Triangle with color of {result} = {confidence}")    
+                        if(i == 0):
+                            rect = cv2.boundingRect(c)
+                            x,y,w,h = rect
+                            cropped = roi[y: y+h, x: x+w]
+                            obj = cv2.resize(cropped, (100, 100))
+                            im = Image.fromarray(obj, 'RGB')
+                            img_array = np.array(im)
+                            img_array = np.expand_dims(img_array, axis=0)
+                            pred = model.predict(img_array)
+                            result = np.argmax(pred)
+                            confidence = int(pred[0][result] * 100)
+                            colors = ["blue", "green", "red"]
+                            print(f"[!]{datetime.datetime.now()} : Triangle with color of {colors[result]}, Confidence {confidence}%")
+                            cv2.imshow("Cropped", obj)    
                 
-                cv2.drawContours(roi, [approx], 0, (0, 0, 255), 5)
+                cv2.drawContours(roi, [approx], -1, (0, 0, 255), 2)
                 
             frame[100:300, 100:300] = roi
             cv2.imshow("contours",	frame)

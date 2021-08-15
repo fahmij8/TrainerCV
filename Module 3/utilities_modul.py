@@ -12,7 +12,7 @@ def init_data(types):
 def init_directory(mode):
     if(mode == 1):
         print("[!] Inititalizing Directory")
-        if(os.path.exists("dataset/firstface")) :
+        if(os.path.exists("dataset")) :
             shutil.rmtree("dataset")
         
 
