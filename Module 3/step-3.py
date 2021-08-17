@@ -27,9 +27,10 @@ if __name__ == '__main__':
             gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
             _, threshold = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
             contours, _ = cv2.findContours(threshold, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+            maskTriangle = roi.copy()
             i = 0
             # list for storing names of shapes 
-            for contour in contours:
+            for index, contour in enumerate(contours):
                 # here we are ignoring first counter because 
                 # findcontour function detects whole image as shape
                 if i == 0:
@@ -40,29 +41,41 @@ if __name__ == '__main__':
                 approx = cv2.approxPolyDP(
                     contour, 0.01 * cv2.arcLength(contour, True), True)
                 
+                M = cv2.moments(contour)
+                if M['m00'] != 0.0:
+                    xtags = int(M['m10']/M['m00'])
+                    ytags = int(M['m01']/M['m00'])
+                else:
+                    xtags = 0
+                    ytags = 0
+
                 # using drawContours() function
                 if len(approx) == 3 :
-                    for i,c in enumerate(contour):
-                        if(i == 0):
-                            rect = cv2.boundingRect(c)
-                            x,y,w,h = rect
-                            cropped = roi[y: y+h, x: x+w]
-                            obj = cv2.resize(cropped, (200, 200))
-                            first_array = np.array([[0, 0, 0],
-                                                    [0, 2, 0],
-                                                    [0, 0, 0]])
-                            second_array = np.ones((3, 3), np.float32) / 9
-                            kernel = first_array - second_array
-                            filtered = cv2.filter2D(obj,-1,kernel)
-                            im = Image.fromarray(filtered, 'RGB')
-                            img_array = np.array(im)
-                            img_array = np.expand_dims(img_array, axis=0)
-                            pred = model.predict(img_array)
-                            result = np.argmax(pred)
-                            confidence = int(pred[0][result] * 100)
-                            colors = ['black','blue','brown','green','grey','orange','red','violet','white','yellow']
-                            print(f"[!]{datetime.datetime.now()} : Triangle with color of {colors[result]}, Confidence {confidence}%")
-                            cv2.imshow("Cropped", obj)    
+                    mask = np.zeros_like(maskTriangle) # Create mask where white is what we want, black otherwise
+                    cv2.drawContours(mask, contours, index,  (255, 255, 255), -1) # Draw filled contour in mask
+                    out = np.zeros_like(maskTriangle) # Extract out the object and place into output image
+                    out[mask == 255] = maskTriangle[mask == 255]
+                    (y, x, channel) = np.where(mask == 255)
+                    (topy, topx) = (np.min(y), np.min(x))
+                    (bottomy, bottomx) = (np.max(y), np.max(x))
+                    out = out[topy:bottomy+1, topx:bottomx+1]
+                    obj = cv2.resize(out, (200, 200))
+                    first_array = np.array([[0, 0, 0],
+                                            [0, 2, 0],
+                                            [0, 0, 0]])
+                    second_array = np.ones((3, 3), np.float32) / 9
+                    kernel = first_array - second_array
+                    filtered = cv2.filter2D(obj,-1,kernel)
+                    im = Image.fromarray(filtered, 'RGB')
+                    img_array = np.array(im)
+                    img_array = np.expand_dims(img_array, axis=0)
+                    pred = model.predict(img_array)
+                    result = np.argmax(pred)
+                    confidence = int(pred[0][result] * 100)
+                    colors = ['black','blue','brown','green','grey','orange','red','violet','white','yellow']
+                    #print(f"[!]{datetime.datetime.now()} : Triangle with color of {colors[result]}, Confidence {confidence}%")
+                    cv2.imshow("Cropped", obj)
+                    cv2.putText(roi, f'{colors[result]} Triangle ({confidence}%)', (xtags, ytags), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)   
                 
                 cv2.drawContours(roi, [approx], -1, (0, 0, 255), 2)
                 

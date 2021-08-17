@@ -38,7 +38,7 @@ def postRequest(predict, appname, devicename, key):
     return response
 
 def prepDataset():
-        r = requests.get("https://firebasestorage.googleapis.com/v0/b/trainercv-dpte.appspot.com/o/datasets%2Fmodule-3.zip?alt=media&token=4627e779-47d3-44ff-b6d7-7d66e3fb4b65")
+        r = requests.get("https://firebasestorage.googleapis.com/v0/b/trainercv-dpte.appspot.com/o/datasets%2Fmodule-3.zip?alt=media&token=d7c2549d-1a30-41dd-89aa-d3de034dd09f")
         if(r.status_code == 200):
             z = zipfile.ZipFile(io.BytesIO(r.content))
             z.extractall()
