@@ -1,10 +1,8 @@
 # =========== Module 1, Step 3 : Model Testing =========== #
-import cv2, sys
+import cv2
 import tensorflow as tf
 import numpy as np
 import utilities_modul as util
-sys.path.append("/usr/grading")
-import grad
 from PIL import Image
 
 if __name__ == '__main__':
@@ -48,9 +46,12 @@ if __name__ == '__main__':
                     cv2.putText(frame,label, (50, 50), cv2.FONT_HERSHEY_COMPLEX, 1, (0,255,255), 2)
 
                 if(detectedTimes == 0 and flagGrading == False):
-                    cv2.destroyAllWindows()
-                    grad.doGrade(usermail, 1, 3)
-                    break
+                    status = util.give_grading(usermail=usermail, steps=3)
+                    if(status == True):
+                        flagGraded = True
+                        break
+                    else:
+                        break
             # Else, webcam not detecting any images
             else:
                 cv2.putText(frame,"Empty", (50, 50), cv2.FONT_HERSHEY_COMPLEX, 1, (0,255,0), 2)
@@ -67,3 +68,5 @@ if __name__ == '__main__':
 
     cv2.destroyAllWindows()
     print("[!] Testing Model Complete")
+    if(flagGraded == False):
+        print("[!] You're not graded due to an error. Repeat this step with the fixing note above, if error still occur please contact administrator")

@@ -1,5 +1,7 @@
 import cv2
-import os, shutil, json, requests
+import os, shutil, json, requests, sys
+sys.path.append("/usr/grading")
+import grad
 
 # Take user data function
 def init_data(types):
@@ -80,3 +82,8 @@ def postRequest(predict, appname, devicename, key):
     }
     response = requests.request("POST", url, data=payload, headers=headers)
     return response
+
+def give_grading(usermail, steps):
+    steps = int(steps)
+    status = grad.doGrade(usermail, 1, steps)
+    return status

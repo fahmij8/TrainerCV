@@ -1,10 +1,8 @@
-# =========== Module 1, Step 3 : Model Testing =========== #
-import cv2, sys
+# =========== Module 1, Step 3 : Model Testing (IoT Implementation) =========== #
+import cv2
 import tensorflow as tf
 import numpy as np
 import utilities_modul as util
-sys.path.append("/usr/grading")
-import grad
 from PIL import Image
 
 if __name__ == '__main__':
@@ -53,13 +51,16 @@ if __name__ == '__main__':
                     util.postRequest(0, appName, deviceName, key)
 
                 if(detectedTimes == 0 and flagGrading == False):
-                    cv2.destroyAllWindows()
-                    break
+                    status = util.give_grading(usermail=usermail, steps=4)
+                    if(status == True):
+                        flagGraded = True
+                        break
+                    else:
+                        break
             # Else, webcam not detecting any images
             else:
                 cv2.putText(frame,"Empty", (50, 50), cv2.FONT_HERSHEY_COMPLEX, 1, (0,255,0), 2)
-                flagGrading = False
-            
+    
             cv2.imshow('Video', frame)
             
             if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -71,3 +72,5 @@ if __name__ == '__main__':
 
     cv2.destroyAllWindows()
     print("[!] Testing complete, Congratulations!")
+    if(flagGraded == False):
+        print("[!] You're not graded due to an error. Repeat this step with the fixing note above, if error still occur please contact administrator")

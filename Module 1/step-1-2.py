@@ -1,9 +1,7 @@
 # =========== Module 1, Step 1.2 : Dataset Taking =========== #
 import cv2
-import sys, time
+import time
 import utilities_modul as util
-sys.path.append("/usr/grading")
-import grad
 
 if __name__ == '__main__':
     # Read Credential
@@ -39,9 +37,12 @@ if __name__ == '__main__':
                     flagGraded = False
                     break
                 elif count == 20:
-                    flagGraded = True
-                    grad.doGrade(usermail, 1, 1)
-                    break
+                    status = util.give_grading(usermail=usermail, steps=1)
+                    if(status == True):
+                        flagGraded = True
+                        break
+                    else:
+                        break
             else:
                 print("[!] Change your webcam URL if you see this many times.")
         except:
