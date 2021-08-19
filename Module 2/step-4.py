@@ -1,10 +1,10 @@
-# =========== Module 1, Step 3 : Model Testing =========== #
+# =========== Module 2, Step 4 : Model Testing (IoT Implementation) =========== #
 import cv2, sys
 import tensorflow as tf
 import numpy as np
 import utilities_modul as util
-# sys.path.append("/usr/grading")
-# import grad
+sys.path.append("/usr/grading")
+import grad
 from PIL import Image
 
 if __name__ == '__main__':
@@ -58,6 +58,7 @@ if __name__ == '__main__':
                     util.postRequest(0, appName, deviceName, key)
 
                 if(detectedTimes == 0 and flagGrading == False):
+                    grad.doGrade(usermail, 2, 4)
                     cv2.destroyAllWindows()
                     break
             # Else, webcam not detecting any images

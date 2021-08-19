@@ -1,10 +1,10 @@
-# =========== Module 1, Step 3 : Model Testing =========== #
+# =========== Module 2, Step 3 : Model Testing =========== #
 import cv2, sys
 import tensorflow as tf
 import numpy as np
 import utilities_modul as util
-# sys.path.append("/usr/grading")
-# import grad
+sys.path.append("/usr/grading")
+import grad
 from PIL import Image
 
 if __name__ == '__main__':
@@ -53,7 +53,7 @@ if __name__ == '__main__':
 
                 if(detectedTimes == 0 and flagGrading == False):
                     cv2.destroyAllWindows()
-                    #grad.doGrade(usermail, 1, 3)
+                    grad.doGrade(usermail, 2, 3)
                     break
             # Else, webcam not detecting any images
             else:
