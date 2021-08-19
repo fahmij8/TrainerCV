@@ -1,4 +1,4 @@
-# =========== Module 4, Step 3 : Testing Model =========== #
+# =========== Module 4, Step 4 : Testing Model =========== #
 import tensorflow_hub as hub
 import tensorflow as tf
 import cv2
@@ -9,6 +9,12 @@ import utilities_modul as util
 from PIL import Image
 
 if __name__ == '__main__':
+    # Read Credential
+    usermail = util.init_data("email")
+    appName = util.init_data("appName")
+    deviceName = util.init_data("deviceName")
+    key = util.init_data("xm2morigin")
+
     # Prepare pre-trained model
     print("[!] Load EfficientDet")
     detector = hub.KerasLayer("./efficientdet/")
@@ -56,6 +62,7 @@ if __name__ == '__main__':
                     (text_width, text_height) = cv2.getTextSize(labelToShow, cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.6, thickness=2)[0]
                     cv2.rectangle(img_boxes, (xmin, ymin-20), (xmin+text_width, ymin+text_height-15), (0, 255, 0), -1)
                     cv2.putText(img_boxes, labelToShow, (xmin, ymin-6), cv2.FONT_HERSHEY_SIMPLEX,  0.6, (255, 255, 255), 2 )
+                    util.postRequest(confidence, appName, deviceName, key)
                     # cv2.putText(img_boxes, f"EfficientDet => {label} : {100 * round(score)}%", (xmin+10, ymax-20), cv2.FONT_HERSHEY_SIMPLEX,  0.4, (255, 255, 255), 2 )
             if(detectAny):
                 cv2.imshow("Object Detection",	img_boxes)
