@@ -1,10 +1,10 @@
-# =========== Module 1, Step 3 : Model Testing =========== #
+# =========== Module 3, Step 4 : Model Testing (IoT Implementation) =========== #
 import cv2, sys, datetime
 import tensorflow as tf
 import numpy as np
 import utilities_modul as util
-# sys.path.append("/usr/grading")
-# import grad
+sys.path.append("/usr/grading")
+import grad
 from PIL import Image
 
 if __name__ == '__main__':
@@ -73,6 +73,7 @@ if __name__ == '__main__':
             frame[100:300, 100:300] = roi
             cv2.imshow("contours",	frame)
             if cv2.waitKey(1) & 0xFF == ord('q'):
+                grad.doGrade(usermail, 3, 4)
                 break
         except:
             print("Unexpected error:", sys.exc_info()[0])
