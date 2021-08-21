@@ -1,8 +1,6 @@
 import cv2
 import os, shutil, json, requests, zipfile, tarfile, sys
 from tqdm import tqdm
-sys.path.append("/usr/grading")
-import grad
 
 # Take user data function
 def init_data(types):
@@ -38,7 +36,10 @@ def postRequest(predict, appname, devicename, key):
         'postman-token': "e10b0cdc-98bc-4459-be34-25417d5f57bd"
     }
     response = requests.request("POST", url, data=payload, headers=headers)
-    return response
+    if(response.status_code == 201):
+        return response
+    else:
+        sys.exit()
 
 def downloadData(mode):
         if(mode == "EfficientDet"):
@@ -69,14 +70,22 @@ def downloadData(mode):
             return True
         return "[!] Pre-trained model preparation failed, please re-run the code or contact admin for further information"
 
-def give_grading(usermail, steps, optionalParam):
-    steps = int(steps)
-    if(isinstance(optionalParam, list)):
-        status = grad.doGrade(usermail, 4, steps, optionalParam)
-    else:
-        status = grad.doGrade(usermail, 4, steps)
-    return status
+def give_grading(usermail, steps, *args, **kwargs):
+    optionalParam = kwargs.get('optionalParam')
+    payload = json.dumps({
+        "usermail": usermail,
+        "steps": steps,
+        "optionalParam": optionalParam
+    })
+    
+    url = "https://trainercv-grading.herokuapp.com/grad-module-4"
+    headers = {
+        'content-type': "application/json",
+        'cache-control': "no-cache",
+        }
 
-def checkGrading(flagGrading):
-    if(flagGrading == False):
-        print("[!] You're not graded due to an error. Repeat this step with the fixing note above, if error still occur please contact administrator")
+    response = requests.request("POST", url, data=payload, headers=headers)
+    if(response.status_code == 200):
+        print(json.loads(response.text)['message'])
+    else:
+        sys.exit()
