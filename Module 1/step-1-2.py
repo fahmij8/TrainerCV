@@ -32,9 +32,11 @@ if __name__ == '__main__':
                 cv2.imshow('Dataset Taker', empty)
                 time.sleep(1)
 
-                if cv2.waitKey(1) == 13: #Break with CTRL + C or Finish take dataset with 20 sample
+                # To quit press q in OpenCV window
+                if cv2.waitKey(1) & 0xFF == ord('q'): 
                     break
-                elif count == 20:
+                
+                if count == 20:
                     util.give_grading(usermail=usermail, steps=1)
                     break
             else:

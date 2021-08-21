@@ -55,6 +55,7 @@ if __name__ == '__main__':
     
             cv2.imshow('Video', frame)
             
+            # To quit press q in OpenCV window
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 util.give_grading(usermail=usermail, steps=4, optionalParam=detectedTimes)
                 break

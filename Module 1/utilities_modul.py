@@ -79,7 +79,10 @@ def postRequest(predict, appname, devicename, key):
     'postman-token': "e10b0cdc-98bc-4459-be34-25417d5f57bd"
     }
     response = requests.request("POST", url, data=payload, headers=headers)
-    return response
+    if(response.status_code == 201):
+        return response
+    else:
+        sys.exit()
 
 def give_grading(usermail, steps, *args, **kwargs):
     if(steps == 1):
@@ -107,4 +110,7 @@ def give_grading(usermail, steps, *args, **kwargs):
         }
 
     response = requests.request("POST", url, data=payload, headers=headers)
-    print(json.loads(response.text)['message'])
+    if(response.status_code == 200):
+        print(json.loads(response.text)['message'])
+    else:
+        sys.exit()
