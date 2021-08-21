@@ -26,7 +26,7 @@ if __name__ == '__main__':
                 file_name_path = './dataset/empty/' + str(count) + '.jpg'
                 cv2.imwrite(file_name_path, empty)
                 count += 1
-                print(count)
+                
                 # Put count on images and display live count
                 cv2.putText(empty, str(count), (50, 50), cv2.FONT_HERSHEY_COMPLEX, 1, (0,255,0), 2)
                 cv2.imshow('Dataset Taker', empty)
@@ -34,7 +34,7 @@ if __name__ == '__main__':
 
                 if cv2.waitKey(1) == 13: #Break with CTRL + C or Finish take dataset with 20 sample
                     break
-                elif count == 1:
+                elif count == 20:
                     util.give_grading(usermail=usermail, steps=1)
                     break
             else:

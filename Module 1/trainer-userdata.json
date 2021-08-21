@@ -1,6 +1,6 @@
 {
     "email": "nashrullahfikri99@gmail.com",
-    "urlCamera": 0,
+    "urlCamera": "http://trainercv-camera.herokuapp.com/video_feed",
     "appName": "TrainerCV",
     "deviceName": "Job-1",
     "xm2morigin": "9634da50ff7abd7a:3bdb608765b907a4"

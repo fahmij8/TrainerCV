@@ -81,22 +81,29 @@ def postRequest(predict, appname, devicename, key):
     response = requests.request("POST", url, data=payload, headers=headers)
     return response
 
-def give_grading(usermail, steps):
-    _, _, files = next(os.walk("./dataset/myface"))
-    file_count1 = len(files)
-    _, _, files = next(os.walk("./dataset/empty"))
-    file_count2 = len(files)
+def give_grading(usermail, steps, *args, **kwargs):
+    if(steps == 1):
+        _, _, files = next(os.walk("./dataset/myface"))
+        file_count1 = len(files)
+        _, _, files = next(os.walk("./dataset/empty"))
+        file_count2 = len(files)
+        payload = json.dumps({
+            "usermail": usermail,
+            "steps": steps,
+            "optionalParam": [file_count1, file_count2]
+        })
+    elif(steps == 2 or steps == 3 or steps == 4):
+        optionalParam = kwargs.get('optionalParam')
+        payload = json.dumps({
+            "usermail": usermail,
+            "steps": steps,
+            "optionalParam": optionalParam
+        })
+    
     url = "https://trainercv-grading.herokuapp.com/grad-module-1"
-
-    payload = json.dumps({
-        "usermail": usermail,
-        "steps": steps,
-        "optionalParam": [file_count1, file_count2]
-    })
     headers = {
         'content-type': "application/json",
         'cache-control': "no-cache",
-        'postman-token': "381c8c3e-6088-64b7-e327-dd6da913652a"
         }
 
     response = requests.request("POST", url, data=payload, headers=headers)
