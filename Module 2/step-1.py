@@ -1,5 +1,5 @@
 # =========== Module 2, Step 1.1 : Dataset Taking (Your Face Sample) =========== #
-import cv2
+import cv2, sys
 import utilities_modul as util
 
 if __name__ == '__main__':
@@ -33,12 +33,17 @@ if __name__ == '__main__':
             else:
                 print("Face not found")
                 pass
-
-            if cv2.waitKey(1) == 13 or count == 20: 
+            
+            if count == 20:
                 break
+            
+            # To quit press q in OpenCV window
+            if cv2.waitKey(1) & 0xFF == ord('q'): 
+                break
+            
         except:
-            print("[!] Change your webcam URL if you see this many times.")
-            pass    
+            print("Unexpected error:", sys.exc_info())
+            break   
 
     cv2.destroyAllWindows()      
     print("[!] Collecting Samples Complete")

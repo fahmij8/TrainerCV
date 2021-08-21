@@ -2,8 +2,6 @@
 import cv2
 import sys, time
 import utilities_modul as util
-sys.path.append("/usr/grading")
-import grad
 
 if __name__ == '__main__':
     # Read Credential
@@ -20,7 +18,6 @@ if __name__ == '__main__':
     print("[!] Taking samples") 
     while True:
         try:
-            flagGrading = False
             ret, frame = cap.read()
             if frame is not None:
                 empty = cv2.resize(frame, (400, 400))
@@ -35,22 +32,19 @@ if __name__ == '__main__':
                 cv2.imshow('Dataset Taker', empty)
                 time.sleep(1)
 
-                if cv2.waitKey(1) == 13: #Break with CTRL + C or Finish take dataset with 20 sample
-                    flagGrading = None
+                if count == 20:
+                    util.give_grading(usermail=usermail, steps=1)
                     break
-                elif count == 20 and flagGrading == False:
-                    status = util.give_grading(usermail=usermail, steps=1)
-                    if(status == True):
-                        flagGrading = True
-                        break
-                    else:
-                        break
+                
+                # To quit press q in OpenCV window
+                if cv2.waitKey(1) & 0xFF == ord('q'): 
+                    break
+                
             else:
                 print("[!] Change your webcam URL if you see this many times.")
         except:
-            print("[!] Change your webcam URL if you see this many times.")
-            pass
+            print("Unexpected error:", sys.exc_info())
+            break
 
     cv2.destroyAllWindows()      
     print("[!] Collecting Samples Complete")
-    util.checkGrading(flagGrading)

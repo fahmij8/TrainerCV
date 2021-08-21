@@ -1,14 +1,11 @@
 import cv2
 import os, shutil, json, requests, sys
-sys.path.append("/usr/grading")
-import grad
 
 # Take user data function
 def init_data(types):
     f = open("trainer-userdata.json")
     data = json.load(f)
     return data[types]
-    
 
 # Face Extractor function
 def face_extractor(img, face_classifier):
@@ -90,16 +87,40 @@ def postRequest(predict, appname, devicename, key):
         'postman-token': "e10b0cdc-98bc-4459-be34-25417d5f57bd"
     }
     response = requests.request("POST", url, data=payload, headers=headers)
-    return response
-
-def give_grading(usermail, steps, optionalParam):
-    steps = int(steps)
-    if(isinstance(optionalParam, list)):
-        status = grad.doGrade(usermail, 2, steps, optionalParam)
+    if(response.status_code == 201):
+        return response
     else:
-        status = grad.doGrade(usermail, 2, steps)
-    return status
+        sys.exit()
 
-def checkGrading(flagGrading):
-    if(flagGrading == False):
-        print("[!] You're not graded due to an error. Repeat this step with the fixing note above, if error still occur please contact administrator")
+def give_grading(usermail, steps, *args, **kwargs):
+    if(steps == 1):
+        _, _, files = next(os.walk("./dataset/firstface"))
+        file_count1 = len(files)
+        _, _, files = next(os.walk("./dataset/secondface"))
+        file_count2 = len(files)
+        _, _, files = next(os.walk("./dataset/empty"))
+        file_count3 = len(files)
+        payload = json.dumps({
+            "usermail": usermail,
+            "steps": steps,
+            "optionalParam": [file_count1, file_count2, file_count3]
+        })
+    elif(steps == 2 or steps == 3 or steps == 4):
+        optionalParam = kwargs.get('optionalParam')
+        payload = json.dumps({
+            "usermail": usermail,
+            "steps": steps,
+            "optionalParam": optionalParam
+        })
+    
+    url = "https://trainercv-grading.herokuapp.com/grad-module-2"
+    headers = {
+        'content-type': "application/json",
+        'cache-control': "no-cache",
+        }
+
+    response = requests.request("POST", url, data=payload, headers=headers)
+    if(response.status_code == 200):
+        print(json.loads(response.text)['message'])
+    else:
+        sys.exit()

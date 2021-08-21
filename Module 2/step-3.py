@@ -1,5 +1,5 @@
 # =========== Module 2, Step 3 : Model Testing =========== #
-import cv2
+import cv2, sys
 import tensorflow as tf
 import numpy as np
 import utilities_modul as util
@@ -17,8 +17,7 @@ if __name__ == '__main__':
 
     # Initialize Webcam
     cap = util.init_camera(util.init_data("urlCamera"))
-    detectedTimes = 15 #EDIT THIS IF YOU WANT TO DETECT MORE LONGER
-    flagGrading = False
+    detectedTimes = 0
 
     # Testing Model
     while True:
@@ -35,41 +34,37 @@ if __name__ == '__main__':
                 pred = model.predict(img_array)
                 result = np.argmax(pred)
                 confidence = int(pred[0][result] * 100)
+    
                 # Image Labeling
                 # If prediction confidence > 0.5 your face is detected 
                 if(result == 1):
-                    detectedTimes -= 1 
+                    detectedTimes += 1 
                     label = f"First Face : ({confidence}%)"
                     cv2.putText(frame,label, (50, 50), cv2.FONT_HERSHEY_COMPLEX, 1, (0,255,0), 2)
                 elif(result == 2):
-                    detectedTimes -= 1
+                    detectedTimes += 1
                     label = f"Second Face : ({confidence}%)"
                     cv2.putText(frame,label, (50, 50), cv2.FONT_HERSHEY_COMPLEX, 1, (0,255,0), 2)
                 else:
                     label = f"Emtpy : ({confidence}%)"
                     cv2.putText(frame,label, (50, 50), cv2.FONT_HERSHEY_COMPLEX, 1, (0,255,255), 2)
-
-                if(detectedTimes == 0 and flagGrading == False):
-                    status = util.give_grading(usermail=usermail, steps=3)
-                    if(status == True):
-                        flagGrading = True
-                        break
-                    else:
-                        break
+                print(f'{detectedTimes} => {pred}')
+                
             # Else, webcam not detecting any images
             else:
+                print("[!] Image not detected")
                 cv2.putText(frame,"Empty", (50, 50), cv2.FONT_HERSHEY_COMPLEX, 1, (255,0,0), 2)
-                flagGrading = False
             
             cv2.imshow('Video', frame)
             
+            # To quit press q in OpenCV window
             if cv2.waitKey(1) & 0xFF == ord('q'):
+                util.give_grading(usermail=usermail, steps=3, optionalParam=detectedTimes)
                 break
+            
         except:
-            flagGrading = None
-            print("[!] Change your webcam URL if you see this many times.")
-            pass
+            print("Unexpected error:", sys.exc_info())
+            break
 
     cv2.destroyAllWindows()
     print("[!] Testing Model Complete")
-    util.checkGrading(flagGrading)
