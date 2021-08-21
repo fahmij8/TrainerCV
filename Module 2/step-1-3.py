@@ -8,7 +8,6 @@ import grad
 if __name__ == '__main__':
     # Read Credential
     usermail = util.init_data("email")
-    flagGraded = None
 
     # Directory Initialization
     util.init_directory(3)
@@ -21,6 +20,7 @@ if __name__ == '__main__':
     print("[!] Taking samples") 
     while True:
         try:
+            flagGrading = False
             ret, frame = cap.read()
             if frame is not None:
                 empty = cv2.resize(frame, (400, 400))
@@ -36,12 +36,15 @@ if __name__ == '__main__':
                 time.sleep(1)
 
                 if cv2.waitKey(1) == 13: #Break with CTRL + C or Finish take dataset with 20 sample
-                    flagGraded = False
+                    flagGrading = None
                     break
-                elif count == 20:
-                    flagGraded = True
-                    grad.doGrade(usermail, 2, 1)
-                    break
+                elif count == 20 and flagGrading == False:
+                    status = util.give_grading(usermail=usermail, steps=1)
+                    if(status == True):
+                        flagGrading = True
+                        break
+                    else:
+                        break
             else:
                 print("[!] Change your webcam URL if you see this many times.")
         except:
@@ -50,5 +53,4 @@ if __name__ == '__main__':
 
     cv2.destroyAllWindows()      
     print("[!] Collecting Samples Complete")
-    if(flagGraded == False):
-        print("[!] You're not graded due to an error. Finish your dataset taking.")
+    util.checkGrading(flagGrading)

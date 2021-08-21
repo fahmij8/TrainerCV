@@ -1,7 +1,5 @@
 import cv2
 import os, shutil, json, requests, sys
-sys.path.append("/usr/grading")
-import grad
 
 # Take user data function
 def init_data(types):
@@ -84,6 +82,22 @@ def postRequest(predict, appname, devicename, key):
     return response
 
 def give_grading(usermail, steps):
-    steps = int(steps)
-    status = grad.doGrade(usermail, 1, steps)
-    return status
+    _, _, files = next(os.walk("./dataset/myface"))
+    file_count1 = len(files)
+    _, _, files = next(os.walk("./dataset/empty"))
+    file_count2 = len(files)
+    url = "https://trainercv-grading.herokuapp.com/grad-module-1"
+
+    payload = json.dumps({
+        "usermail": usermail,
+        "steps": steps,
+        "optionalParam": [file_count1, file_count2]
+    })
+    headers = {
+        'content-type': "application/json",
+        'cache-control': "no-cache",
+        'postman-token': "381c8c3e-6088-64b7-e327-dd6da913652a"
+        }
+
+    response = requests.request("POST", url, data=payload, headers=headers)
+    print(json.loads(response.text)['message'])

@@ -1,10 +1,8 @@
 # =========== Module 2, Step 4 : Model Testing (IoT Implementation) =========== #
-import cv2, sys
+import cv2
 import tensorflow as tf
 import numpy as np
 import utilities_modul as util
-sys.path.append("/usr/grading")
-import grad
 from PIL import Image
 
 if __name__ == '__main__':
@@ -22,12 +20,12 @@ if __name__ == '__main__':
 
     # Initialize Webcam
     cap = util.init_camera(util.init_data("urlCamera"))
-    detectedTimes = 15 #EDIT THIS IF YOU WANT TO DETECT MORE LONGER
-    flagGrading = False
+    detectedTimes = 15
 
     # Testing Model
     while True:
         try:
+            flagGrading = False
             ret, frame = cap.read()
             face=util.face_extractor_boundaries(frame, face_classifier)
             # If Webcam detecting face
@@ -58,9 +56,12 @@ if __name__ == '__main__':
                     util.postRequest(0, appName, deviceName, key)
 
                 if(detectedTimes == 0 and flagGrading == False):
-                    grad.doGrade(usermail, 2, 4)
-                    cv2.destroyAllWindows()
-                    break
+                    status = util.give_grading(usermail=usermail, steps=4)
+                    if(status == True):
+                        flagGrading = True
+                        break
+                    else:
+                        break
             # Else, webcam not detecting any images
             else:
                 cv2.putText(frame,"Empty", (50, 50), cv2.FONT_HERSHEY_COMPLEX, 1, (255,0,0), 2)
@@ -77,3 +78,4 @@ if __name__ == '__main__':
 
     cv2.destroyAllWindows()
     print("[!] Testing Model Complete")
+    util.checkGrading(flagGrading)

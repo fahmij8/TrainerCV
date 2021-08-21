@@ -1,12 +1,11 @@
 # =========== Module 1, Step 1.2 : Dataset Taking =========== #
 import cv2
-import time
+import time, sys
 import utilities_modul as util
 
 if __name__ == '__main__':
     # Read Credential
     usermail = util.init_data("email")
-    flagGraded = None
 
     # Directory Initialization
     util.init_directory(2)
@@ -27,29 +26,22 @@ if __name__ == '__main__':
                 file_name_path = './dataset/empty/' + str(count) + '.jpg'
                 cv2.imwrite(file_name_path, empty)
                 count += 1
-                
+                print(count)
                 # Put count on images and display live count
                 cv2.putText(empty, str(count), (50, 50), cv2.FONT_HERSHEY_COMPLEX, 1, (0,255,0), 2)
                 cv2.imshow('Dataset Taker', empty)
                 time.sleep(1)
 
                 if cv2.waitKey(1) == 13: #Break with CTRL + C or Finish take dataset with 20 sample
-                    flagGraded = False
                     break
-                elif count == 20:
-                    status = util.give_grading(usermail=usermail, steps=1)
-                    if(status == True):
-                        flagGraded = True
-                        break
-                    else:
-                        break
+                elif count == 1:
+                    util.give_grading(usermail=usermail, steps=1)
+                    break
             else:
                 print("[!] Change your webcam URL if you see this many times.")
         except:
-            print("[!] Change your webcam URL if you see this many times.")
-            pass
+            print("Unexpected error:", sys.exc_info())
+            break
 
-    cv2.destroyAllWindows()      
+    cv2.destroyAllWindows()
     print("[!] Collecting Samples Complete")
-    if(flagGraded == False):
-        print("[!] You're not graded due to an error. Finish your dataset taking.")

@@ -21,11 +21,11 @@ if __name__ == '__main__':
     # Initialize Webcam
     cap = util.init_camera(util.init_data("urlCamera"))
     detectedTimes = 15
-    flagGrading = False
 
     # Testing Model
     while True:
         try:
+            flagGrading = False
             ret, frame = cap.read()
             face=util.face_extractor_boundaries(frame, face_classifier)
             # If Webcam detecting face
@@ -53,7 +53,7 @@ if __name__ == '__main__':
                 if(detectedTimes == 0 and flagGrading == False):
                     status = util.give_grading(usermail=usermail, steps=4)
                     if(status == True):
-                        flagGraded = True
+                        flagGrading = True
                         break
                     else:
                         break
@@ -72,5 +72,4 @@ if __name__ == '__main__':
 
     cv2.destroyAllWindows()
     print("[!] Testing complete, Congratulations!")
-    if(flagGraded == False):
-        print("[!] You're not graded due to an error. Repeat this step with the fixing note above, if error still occur please contact administrator")
+    util.checkGrading(flagGrading)

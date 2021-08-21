@@ -1,5 +1,7 @@
 import cv2
-import os, shutil, json, requests, zipfile, io
+import os, shutil, json, requests, zipfile, io, sys
+sys.path.append("/usr/grading")
+import grad
 
 # Take user data function
 def init_data(types):
@@ -45,3 +47,15 @@ def prepDataset():
             return True
         else :
             return "[!] Dataset preparation failed, please re-run the code or contact admin for further information"
+
+def give_grading(usermail, steps, optionalParam):
+    steps = int(steps)
+    if(isinstance(optionalParam, list)):
+        status = grad.doGrade(usermail, 3, steps, optionalParam)
+    else:
+        status = grad.doGrade(usermail, 3, steps)
+    return status
+
+def checkGrading(flagGrading):
+    if(flagGrading == False):
+        print("[!] You're not graded due to an error. Repeat this step with the fixing note above, if error still occur please contact administrator")

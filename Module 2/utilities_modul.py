@@ -1,5 +1,7 @@
 import cv2
-import os, shutil, json, requests
+import os, shutil, json, requests, sys
+sys.path.append("/usr/grading")
+import grad
 
 # Take user data function
 def init_data(types):
@@ -89,3 +91,15 @@ def postRequest(predict, appname, devicename, key):
     }
     response = requests.request("POST", url, data=payload, headers=headers)
     return response
+
+def give_grading(usermail, steps, optionalParam):
+    steps = int(steps)
+    if(isinstance(optionalParam, list)):
+        status = grad.doGrade(usermail, 2, steps, optionalParam)
+    else:
+        status = grad.doGrade(usermail, 2, steps)
+    return status
+
+def checkGrading(flagGrading):
+    if(flagGrading == False):
+        print("[!] You're not graded due to an error. Repeat this step with the fixing note above, if error still occur please contact administrator")

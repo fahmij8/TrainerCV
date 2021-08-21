@@ -1,6 +1,8 @@
 import cv2
-import os, shutil, json, requests, zipfile, io, tarfile
+import os, shutil, json, requests, zipfile, tarfile, sys
 from tqdm import tqdm
+sys.path.append("/usr/grading")
+import grad
 
 # Take user data function
 def init_data(types):
@@ -66,3 +68,15 @@ def downloadData(mode):
                 tar.close()
             return True
         return "[!] Pre-trained model preparation failed, please re-run the code or contact admin for further information"
+
+def give_grading(usermail, steps, optionalParam):
+    steps = int(steps)
+    if(isinstance(optionalParam, list)):
+        status = grad.doGrade(usermail, 4, steps, optionalParam)
+    else:
+        status = grad.doGrade(usermail, 4, steps)
+    return status
+
+def checkGrading(flagGrading):
+    if(flagGrading == False):
+        print("[!] You're not graded due to an error. Repeat this step with the fixing note above, if error still occur please contact administrator")
