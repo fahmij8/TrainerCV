@@ -29,6 +29,7 @@ if __name__ == '__main__':
         cv2.rectangle(img,(20,400),(460,440),(0,255,204),cv2.FILLED)
         cv2.rectangle(img,(20,400),(460,440),(0,0,0),5)
         
+        detectedTimes = 0
         if res.multi_hand_landmarks:
             for hand_landmarks in res.multi_hand_landmarks:
                 for idx,lm in enumerate(hand_landmarks.landmark):
@@ -39,6 +40,7 @@ if __name__ == '__main__':
                         # Try to inspect variable lmlist first!
                         # Detailed hand landmark key : https://google.github.io/mediapipe/images/mobile/hand_landmarks.png
                         if(lmlist[8][2] < lmlist[5][2]):
+                            detectedTimes += 1
                             result = "Index finger tip is raised"
                         else :
                             result = "Index finger tip is closed"
@@ -55,6 +57,7 @@ if __name__ == '__main__':
         
         #press q to quit
         if cv2.waitKey(1) == ord('q'):
+            util.give_grading(usermail=usermail, steps=2, optionalParam=detectedTimes)
             break
         
     cv2.destroyAllWindows()

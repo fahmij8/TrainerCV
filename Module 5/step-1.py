@@ -15,7 +15,8 @@ if __name__ == '__main__':
 
     # Initialize webcam
     cap = util.init_camera(util.init_data("urlCamera"))
-    
+    detectedTimes = 0
+
     while True:
         success, img=cap.read()
         img = cv2.flip(img,1)
@@ -24,16 +25,18 @@ if __name__ == '__main__':
         
         if res.multi_hand_landmarks:
             for hand_landmarks in res.multi_hand_landmarks:
-                    draw.draw_landmarks(img,
-                                        hand_landmarks,
-                                        medhands.HAND_CONNECTIONS,
-                                        util.landmark_style_index(),
-                                        draw.DrawingSpec(color=(0,255,0),thickness=2,circle_radius=3))
+                detectedTimes += 1
+                draw.draw_landmarks(img,
+                                    hand_landmarks,
+                                    medhands.HAND_CONNECTIONS,
+                                    util.landmark_style_index(),
+                                    draw.DrawingSpec(color=(0,255,0),thickness=2,circle_radius=3))
 
         cv2.imshow("hand gestures",img)
         
         #press q to quit
         if cv2.waitKey(1) == ord('q'):
+            util.give_grading(usermail=usermail, steps=1, optionalParam=detectedTimes)
             break
         
     cv2.destroyAllWindows()
