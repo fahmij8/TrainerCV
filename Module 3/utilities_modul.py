@@ -1,7 +1,5 @@
 import cv2
 import os, shutil, json, requests, zipfile, io, sys
-sys.path.append("/usr/grading")
-import grad
 
 # Take user data function
 def init_data(types):
@@ -37,7 +35,10 @@ def postRequest(predict, appname, devicename, key):
         'postman-token': "e10b0cdc-98bc-4459-be34-25417d5f57bd"
     }
     response = requests.request("POST", url, data=payload, headers=headers)
-    return response
+    if(response.status_code == 201):
+        return response
+    else:
+        sys.exit()
 
 def prepDataset():
         r = requests.get("https://firebasestorage.googleapis.com/v0/b/trainercv-dpte.appspot.com/o/datasets%2Fmodule-3.zip?alt=media&token=d7c2549d-1a30-41dd-89aa-d3de034dd09f")
@@ -48,14 +49,22 @@ def prepDataset():
         else :
             return "[!] Dataset preparation failed, please re-run the code or contact admin for further information"
 
-def give_grading(usermail, steps, optionalParam):
-    steps = int(steps)
-    if(isinstance(optionalParam, list)):
-        status = grad.doGrade(usermail, 3, steps, optionalParam)
-    else:
-        status = grad.doGrade(usermail, 3, steps)
-    return status
+def give_grading(usermail, steps, *args, **kwargs):
+    optionalParam = kwargs.get('optionalParam')
+    payload = json.dumps({
+        "usermail": usermail,
+        "steps": steps,
+        "optionalParam": optionalParam
+    })
+    
+    url = "https://trainercv-grading.herokuapp.com/grad-module-3"
+    headers = {
+        'content-type': "application/json",
+        'cache-control': "no-cache",
+        }
 
-def checkGrading(flagGrading):
-    if(flagGrading == False):
-        print("[!] You're not graded due to an error. Repeat this step with the fixing note above, if error still occur please contact administrator")
+    response = requests.request("POST", url, data=payload, headers=headers)
+    if(response.status_code == 200):
+        print(json.loads(response.text)['message'])
+    else:
+        sys.exit()

@@ -14,7 +14,7 @@ if __name__ == '__main__':
 
     # Initialize Webcam
     cap = util.init_camera(util.init_data("urlCamera"))
-    detectedTimes = 60
+    detectedTimes = 0
 
     # Testing Model
     while True:
@@ -55,7 +55,7 @@ if __name__ == '__main__':
 
                 # If shape approximation equals to triangle (having 3 corner)
                 if len(approx) == 3 :
-                    detectedTimes -= 1
+                    detectedTimes += 1
                     # Mask out the triangle
                     mask = np.zeros_like(maskTriangle)
                     cv2.drawContours(mask, contours, index,  (255, 255, 255), -1)
@@ -86,7 +86,8 @@ if __name__ == '__main__':
 
                     # Predict the images
                     pred = model.predict(img_array)
-
+                    print(f'{detectedTimes} => {pred}')
+                    
                     # Determine which label the images fall for
                     result = np.argmax(pred)
                     confidence = int(pred[0][result] * 100)
@@ -105,12 +106,13 @@ if __name__ == '__main__':
             # Show frame
             cv2.imshow("contours",	frame)
 
+            # To quit press q in OpenCV window
             if cv2.waitKey(1) & 0xFF == ord('q'):
+                util.give_grading(usermail=usermail, steps=3, optionalParam=detectedTimes)
                 break
         except:
-            flagGrading = None
             print("Unexpected error:", sys.exc_info()[0])
-            raise
+            break
 
     cv2.destroyAllWindows()
     print("[!] Testing Model Complete")
