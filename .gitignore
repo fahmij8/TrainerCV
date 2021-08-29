@@ -1,0 +1,32 @@
+.vscode
+
+Module 1/__pycache__
+Module 2/__pycache__
+Module 3/__pycache__
+Module 4/__pycache__
+Module 5/__pycache__
+
+Module 1/.ipynb_checkpoints
+Module 2/.ipynb_checkpoints
+Module 3/.ipynb_checkpoints
+Module 4/.ipynb_checkpoints
+Module 5/.ipynb_checkpoints
+
+Module 1/dataset
+Module 2/dataset
+Module 3/training_dataset
+Module 4/efficientdet*
+Module 4/EfficientDet*
+
+Module 1/model_module-1.h5
+Module 2/model_module-2.h5
+Module 3/model_module-3.h5
+Module 4/model_module-4.h5
+Module 4/model_module-4.zip
+Module 5/model_module-5.h5
+
+Module 1/utilities_modul.pyc
+Module 2/utilities_modul.pyc
+Module 3/utilities_modul.pyc
+Module 4/utilities_modul.pyc
+Module 5/utilities_modul.pyc
