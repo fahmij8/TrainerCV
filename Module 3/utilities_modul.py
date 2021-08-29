@@ -1,6 +1,11 @@
 import cv2
 import os, shutil, json, requests, zipfile, io, sys
 
+def init_clearmemory():
+    os.system("free -h")
+    os.system("echo 'upi123' | sudo -S -k sh -c 'echo 3 > /proc/sys/vm/drop_caches' ")
+    os.system("free -h")
+
 # Take user data function
 def init_data(types):
     f = open("trainer-userdata.json")
@@ -24,9 +29,14 @@ def init_camera(url):
 
 # Post LED State Function
 def postRequest(predict, appname, devicename, key):
-    # Function to push state of LED to antares devices
     url = "https://platform.antares.id:8443/~/antares-cse/antares-id/" + appname + "/" + devicename
-    payload = "{\r\n    \"m2m:cin\": {\r\n    \"con\": \"{\\\"color\\\":" + str(predict) + "}\"\r\n    }\r\n}"
+    payload = json.dumps({
+        "m2m:cin" : {
+            "con" : json.dumps({
+                "color" : str(predict)
+            })
+        }
+    })
     headers = {
         'x-m2m-origin': key,
         'content-type': "application/json;ty=4",
@@ -38,6 +48,7 @@ def postRequest(predict, appname, devicename, key):
     if(response.status_code == 201):
         return response
     else:
+        print("Package not sended")
         sys.exit()
 
 def prepDataset():

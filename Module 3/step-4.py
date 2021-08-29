@@ -1,11 +1,14 @@
 # =========== Module 3, Step 4 : Model Testing (IoT Implementation) =========== #
-import cv2, sys, datetime
+import cv2, traceback, datetime
 import tensorflow as tf
 import numpy as np
 import utilities_modul as util
 from PIL import Image
 
 if __name__ == '__main__':
+    # Clear memory
+    util.init_clearmemory()
+
     # Read Credential
     usermail = util.init_data("email")
     appName = util.init_data("appName")
@@ -22,17 +25,14 @@ if __name__ == '__main__':
     # Testing Model
     while True:
         try:
+            flagGrading = False
             ret, frame = cap.read()
-            # Create region of interest
-            cv2.rectangle(frame, (100, 300), (300, 100), (255, 0, 0), 2)
-            # Take images inside the ROI [y:y+h, w:w+h]
-            roi = frame[100:300, 100:300]
             # Filter image to gray
-            gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             # Find image contour
             _, threshold = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
             contours, _ = cv2.findContours(threshold, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-            maskTriangle = roi.copy()
+            maskTriangle = frame.copy()
             i = 0
             
             for index, contour in enumerate(contours):
@@ -56,7 +56,7 @@ if __name__ == '__main__':
                     ytags = 0
 
                 # If shape approximation equals to triangle (having 3 corner)
-                if len(approx) == 3 :
+                if len(approx) == 3 and cv2.contourArea(contours[index]) > 350 :
                     detectedTimes += 1
                     # Mask out the triangle
                     mask = np.zeros_like(maskTriangle)
@@ -72,41 +72,31 @@ if __name__ == '__main__':
 
                     # Image pre-processing, resize image
                     obj = cv2.resize(out, (200, 200))
-
-                    # Image pre-processing, sharpen image
-                    first_array = np.array([[0, 0, 0],
-                                            [0, 2, 0],
-                                            [0, 0, 0]])
-                    second_array = np.ones((3, 3), np.float32) / 9
-                    kernel = first_array - second_array
-                    filtered = cv2.filter2D(obj,-1,kernel)
+                    obj = cv2.cvtColor(obj, cv2.COLOR_BGR2RGB)
 
                     # Image pre-processing, turn images to numpy array
-                    im = Image.fromarray(filtered, 'RGB')
-                    img_array = np.array(im)
-                    img_array = np.expand_dims(img_array, axis=0)
+                    x = tf.keras.preprocessing.image.img_to_array(obj)
+                    x /= 255
+                    x = np.expand_dims(x, axis=0)
+                    images = np.vstack([x])
 
                     # Predict the images
-                    pred = model.predict(img_array)
+                    pred = model.predict(images)
                     print(f'{detectedTimes} => {pred}')
-
+                    
                     # Determine which label the images fall for
                     result = np.argmax(pred)
                     confidence = int(pred[0][result] * 100)
                     colors = ['black','blue','brown','green','grey','orange','red','violet','white','yellow']
 
-                    # Send result to Antares device
+                    # Showing image and text
+                    obj = cv2.cvtColor(obj, cv2.COLOR_RGB2BGR)
+                    cv2.imshow("Cropped", obj)
+                    cv2.putText(frame, f'{colors[result]} Triangle ({confidence}%)', (xtags, ytags), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
                     util.postRequest(colors[result], appName, deviceName, key)
 
-                    # Showing image and text
-                    cv2.imshow("Cropped", obj)
-                    cv2.putText(roi, f'{colors[result]} Triangle ({confidence}%)', (xtags, ytags), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
-                    
-                # Showing image contour
-                cv2.drawContours(roi, [approx], -1, (0, 0, 255), 2)
-
-            # Re-apply contour to ROI area    
-            frame[100:300, 100:300] = roi
+                    # Showing image contour
+                    cv2.drawContours(frame, [approx], -1, (0, 0, 255), 2)
 
             # Show frame
             cv2.imshow("contours",	frame)
@@ -116,8 +106,8 @@ if __name__ == '__main__':
                 util.give_grading(usermail=usermail, steps=4, optionalParam=detectedTimes)
                 break
         except:
-            print("Unexpected error:", sys.exc_info()[0])
-            raise
+            print("Unexpected error:", traceback.format_exc())
+            break
 
     cv2.destroyAllWindows()
     print("[!] Testing Model Complete")
