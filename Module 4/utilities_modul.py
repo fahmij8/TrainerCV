@@ -2,6 +2,11 @@ import cv2
 import os, shutil, json, requests, zipfile, tarfile, sys
 from tqdm import tqdm
 
+def init_clearmemory():
+    os.system("free -h")
+    os.system("echo 'upi123' | sudo -S -k sh -c 'echo 3 > /proc/sys/vm/drop_caches' ")
+    os.system("free -h")
+
 # Take user data function
 def init_data(types):
     f = open("trainer-userdata.json")
@@ -27,7 +32,15 @@ def init_camera(url):
 def postRequest(predict, appname, devicename, key):
     # Function to push state of LED to antares devices
     url = "https://platform.antares.id:8443/~/antares-cse/antares-id/" + appname + "/" + devicename
-    payload = "{\r\n    \"m2m:cin\": {\r\n    \"con\": \"{\\\"confidence\\\":" + str(predict) + "}\"\r\n    }\r\n}"
+    payload = json.dumps({
+        "m2m:cin" : {
+            "con" : json.dumps({
+                "fruit" : str(predict[0]),
+                "ripeness" : str(predict[1]),
+                "confidence": float(predict[2])
+            })
+        }
+    })
     headers = {
         'x-m2m-origin': key,
         'content-type': "application/json;ty=4",
@@ -43,33 +56,34 @@ def postRequest(predict, appname, devicename, key):
 
 def downloadData(mode):
         if(mode == "EfficientDet"):
-            url = "https://firebasestorage.googleapis.com/v0/b/trainercv-dpte.appspot.com/o/EfficientDet.zip?alt=media&token=ab072dab-e9ba-4ef8-9bb4-a165ab68d48e"
-            filename = 'EfficientDet.zip'
-        elif(mode == "FruitModel"):
-            url = "https://firebasestorage.googleapis.com/v0/b/trainercv-dpte.appspot.com/o/model_module-4.zip?alt=media&token=5d053d40-a254-4959-8511-c23ab8fb9472"
-            filename = 'model_module-4.zip'
+            url = "https://firebasestorage.googleapis.com/v0/b/trainercv-dpte.appspot.com/o/efficientdet.zip?alt=media&token=f137bb13-a20c-4c3f-9c67-7884f26a1dc6"
+            filename = 'efficientdet.zip'
         
-        response = requests.get(url, stream=True)
-        total_size_in_bytes= int(response.headers.get('content-length', 0))
-        block_size = 1024 #1 Kibibyte
-        progress_bar = tqdm(total=total_size_in_bytes, unit='iB', unit_scale=True)
-        with open(filename, 'wb') as file:
-            for data in response.iter_content(block_size):
-                progress_bar.update(len(data))
-                file.write(data)
-        progress_bar.close()
-        if total_size_in_bytes != 0 and progress_bar.n != total_size_in_bytes:
-            print("ERROR, something went wrong")
-        if(os.path.exists(filename)) :
-            z = zipfile.ZipFile(filename)
-            z.extractall()
-            if(mode == "EfficientDet"):
-                tar = tarfile.open("efficientdet_lite2_detection_1.tar.gz", "r:gz")
-                tar.extractall(path="./efficientdet")
-                tar.close()
+        if(not os.path.isfile(filename)):
+            response = requests.get(url, stream=True)
+            total_size_in_bytes= int(response.headers.get('content-length', 0))
+            block_size = 1024 #1 Kibibyte
+            progress_bar = tqdm(total=total_size_in_bytes, unit='iB', unit_scale=True)
+            with open(filename, 'wb') as file:
+                for data in response.iter_content(block_size):
+                    progress_bar.update(len(data))
+                    file.write(data)
+            progress_bar.close()
+            if total_size_in_bytes != 0 and progress_bar.n != total_size_in_bytes:
+                print("ERROR, something went wrong")
+            if(os.path.exists(filename)) :
+                z = zipfile.ZipFile(filename)
+                z.extractall()
+                if(mode == "EfficientDet"):
+                    tar = tarfile.open("efficientdet_lite0_detection_1.tar.gz", "r:gz")
+                    tar.extractall(path="./efficientdet")
+                    tar.close()
+                return True
+            return "[!] Pre-trained model preparation failed, please re-run the code or contact admin for further information"
+        else:
+            print(f"[!] File {mode} is already available")
             return True
-        return "[!] Pre-trained model preparation failed, please re-run the code or contact admin for further information"
-
+            
 def give_grading(usermail, steps, *args, **kwargs):
     optionalParam = kwargs.get('optionalParam')
     payload = json.dumps({
