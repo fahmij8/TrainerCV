@@ -6,6 +6,9 @@ import utilities_modul as util
 from PIL import Image
 
 if __name__ == '__main__':
+    # Clear memory
+    util.init_clearmemory()
+
     # Read Credential
     usermail = util.init_data("email")
     appName = util.init_data("appName")

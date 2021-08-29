@@ -1,6 +1,11 @@
 import cv2
 import os, shutil, json, requests, sys
 
+def init_clearmemory():
+    os.system("free -h")
+    os.system("echo 'upi123' | sudo -S -k sh -c 'echo 3 > /proc/sys/vm/drop_caches' ")
+    os.system("free -h")
+    
 # Take user data function
 def init_data(types):
     f = open("trainer-userdata.json")
