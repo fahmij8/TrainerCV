@@ -1,7 +1,11 @@
 import cv2
 import os, shutil, json, requests, sys
 from mediapipe.python.solutions.hands import HandLandmark
-from mediapipe.python.solutions.drawing_utils import DrawingSpec
+
+def init_clearmemory():
+    os.system("free -h")
+    os.system("echo 'upi123' | sudo -S -k sh -c 'echo 3 > /proc/sys/vm/drop_caches' ")
+    os.system("free -h")
 
 # Take user data function
 def init_data(types):
@@ -50,7 +54,7 @@ def give_grading(usermail, steps, *args, **kwargs):
         "optionalParam": optionalParam
     })
     
-    url = "https://trainercv-grading.herokuapp.com/grad-module-3"
+    url = "https://trainercv-grading.herokuapp.com/grad-module-5"
     headers = {
         'content-type': "application/json",
         'cache-control': "no-cache",
@@ -62,68 +66,30 @@ def give_grading(usermail, steps, *args, **kwargs):
     else:
         sys.exit()
 
-def landmark_style_index():
-    _PALM_LANMARKS = (HandLandmark.WRIST, HandLandmark.THUMB_CMC,
-                    HandLandmark.INDEX_FINGER_MCP, HandLandmark.MIDDLE_FINGER_MCP,
-                    HandLandmark.RING_FINGER_MCP, HandLandmark.PINKY_MCP)
-    _THUMP_LANDMARKS = (HandLandmark.THUMB_MCP, HandLandmark.THUMB_IP,
-                        HandLandmark.THUMB_TIP)
-    _INDEX_FINGER_LANDMARKS = (HandLandmark.INDEX_FINGER_PIP,
-                            HandLandmark.INDEX_FINGER_DIP)
-    _INDEX_FINGER_TIP_LANDMARKS = (HandLandmark.INDEX_FINGER_TIP, HandLandmark.INDEX_FINGER_TIP)
-    _MIDDLE_FINGER_LANDMARKS = (HandLandmark.MIDDLE_FINGER_PIP,
-                                HandLandmark.MIDDLE_FINGER_DIP,
-                                HandLandmark.MIDDLE_FINGER_TIP)
-    _RING_FINGER_LANDMARKS = (HandLandmark.RING_FINGER_PIP,
-                            HandLandmark.RING_FINGER_DIP,
-                            HandLandmark.RING_FINGER_TIP)
-    _PINKY_FINGER_LANDMARKS = (HandLandmark.PINKY_PIP, HandLandmark.PINKY_DIP,
-                            HandLandmark.PINKY_TIP)
-    
-    _RADIUS = 5
-    _RED = (48, 48, 255)
-    _GREEN = (48, 255, 48)
-    _BLUE = (192, 101, 21)
-    _YELLOW = (0, 204, 255)
-    _GRAY = (128, 128, 128)
-    _PURPLE = (128, 64, 128)
-    _PEACH = (180, 229, 255)
-    _WHITE = (224, 224, 224)
-
-    # Hands
-    _THICKNESS_WRIST_MCP = 3
-    _THICKNESS_FINGER = 2
-    _THICKNESS_DOT = -1
-
-    _HAND_LANDMARK_STYLE = {
-        _PALM_LANMARKS:
-            DrawingSpec(
-                color=_RED, thickness=_THICKNESS_DOT, circle_radius=_RADIUS),
-        _THUMP_LANDMARKS:
-            DrawingSpec(
-                color=_RED, thickness=_THICKNESS_DOT, circle_radius=_RADIUS),
-        _INDEX_FINGER_LANDMARKS:
-            DrawingSpec(
-                color=_RED, thickness=_THICKNESS_DOT, circle_radius=_RADIUS),
-        _INDEX_FINGER_TIP_LANDMARKS:
-            DrawingSpec(
-                color=_YELLOW, thickness=_THICKNESS_DOT, circle_radius=_RADIUS+3),
-        _MIDDLE_FINGER_LANDMARKS:
-            DrawingSpec(
-                color=_RED, thickness=_THICKNESS_DOT, circle_radius=_RADIUS),
-        _RING_FINGER_LANDMARKS:
-            DrawingSpec(
-                color=_RED, thickness=_THICKNESS_DOT, circle_radius=_RADIUS),
-        _PINKY_FINGER_LANDMARKS:
-            DrawingSpec(
-                color=_RED, thickness=_THICKNESS_DOT, circle_radius=_RADIUS),
-    }
-
-    hand_landmark_style = {}
-    for k, v in _HAND_LANDMARK_STYLE.items():
-        for landmark in k:
-            hand_landmark_style[landmark] = v
-    return hand_landmark_style
+def hand_connections():
+    return frozenset([
+        (HandLandmark.WRIST, HandLandmark.THUMB_CMC),
+        (HandLandmark.THUMB_CMC, HandLandmark.THUMB_MCP),
+        (HandLandmark.THUMB_MCP, HandLandmark.THUMB_IP),
+        (HandLandmark.THUMB_IP, HandLandmark.THUMB_TIP),
+        (HandLandmark.INDEX_FINGER_MCP, HandLandmark.INDEX_FINGER_PIP),
+        (HandLandmark.INDEX_FINGER_PIP, HandLandmark.INDEX_FINGER_DIP),
+        (HandLandmark.INDEX_FINGER_DIP, HandLandmark.INDEX_FINGER_TIP),
+        (HandLandmark.INDEX_FINGER_MCP, HandLandmark.MIDDLE_FINGER_MCP),
+        (HandLandmark.MIDDLE_FINGER_MCP, HandLandmark.MIDDLE_FINGER_PIP),
+        (HandLandmark.MIDDLE_FINGER_PIP, HandLandmark.MIDDLE_FINGER_DIP),
+        (HandLandmark.MIDDLE_FINGER_DIP, HandLandmark.MIDDLE_FINGER_TIP),
+        (HandLandmark.MIDDLE_FINGER_MCP, HandLandmark.RING_FINGER_MCP),
+        (HandLandmark.RING_FINGER_MCP, HandLandmark.RING_FINGER_PIP),
+        (HandLandmark.RING_FINGER_PIP, HandLandmark.RING_FINGER_DIP),
+        (HandLandmark.RING_FINGER_DIP, HandLandmark.RING_FINGER_TIP),
+        (HandLandmark.RING_FINGER_MCP, HandLandmark.PINKY_MCP),
+        (HandLandmark.WRIST, HandLandmark.PINKY_MCP),
+        (HandLandmark.PINKY_MCP, HandLandmark.PINKY_PIP),
+        (HandLandmark.PINKY_PIP, HandLandmark.PINKY_DIP),
+        (HandLandmark.PINKY_DIP, HandLandmark.PINKY_TIP),
+        (HandLandmark.INDEX_FINGER_MCP, HandLandmark.THUMB_CMC)
+    ])
 
 
 def show_answer_step_3(lmlist, tipids):
