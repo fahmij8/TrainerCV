@@ -1,5 +1,6 @@
 import cv2
-import os, shutil, json, requests, zipfile, io, sys
+import os, shutil, json, requests, zipfile, sys
+from tqdm import tqdm
 
 def init_clearmemory():
     os.system("free -h")
@@ -52,13 +53,29 @@ def postRequest(predict, appname, devicename, key):
         sys.exit()
 
 def prepDataset():
-        r = requests.get("https://firebasestorage.googleapis.com/v0/b/trainercv-dpte.appspot.com/o/datasets%2Fmodule-3.zip?alt=media&token=d7c2549d-1a30-41dd-89aa-d3de034dd09f")
-        if(r.status_code == 200):
-            z = zipfile.ZipFile(io.BytesIO(r.content))
+    url = "https://firebasestorage.googleapis.com/v0/b/trainercv-dpte.appspot.com/o/datasets%2Fmodule-3.zip?alt=media&token=d7c2549d-1a30-41dd-89aa-d3de034dd09f"
+    filename = 'module-3.zip'
+    if(not os.path.isfile(filename)):
+        response = requests.get(url, stream=True)
+        total_size_in_bytes= int(response.headers.get('content-length', 0))
+        block_size = 1024 #1 Kibibyte
+        progress_bar = tqdm(total=total_size_in_bytes, unit='iB', unit_scale=True)
+        with open(filename, 'wb') as file:
+            for data in response.iter_content(block_size):
+                progress_bar.update(len(data))
+                file.write(data)
+        progress_bar.close()
+        if total_size_in_bytes != 0 and progress_bar.n != total_size_in_bytes:
+            print("ERROR, something went wrong")
+        if(os.path.exists(filename)) :
+            z = zipfile.ZipFile(filename)
             z.extractall()
             return True
-        else :
-            return "[!] Dataset preparation failed, please re-run the code or contact admin for further information"
+        return "[!] Pre-trained model preparation failed, please re-run the code or contact admin for further information"
+    else:
+        print(f"[!] File module-3.zip is already available")
+        return True
+
 
 def give_grading(usermail, steps, *args, **kwargs):
     optionalParam = kwargs.get('optionalParam')
