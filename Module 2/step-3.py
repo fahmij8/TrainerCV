@@ -1,5 +1,5 @@
 # =========== Module 2, Step 3 : Model Testing =========== #
-import cv2, sys
+import cv2, traceback
 import tensorflow as tf
 import numpy as np
 import utilities_modul as util
@@ -66,7 +66,7 @@ if __name__ == '__main__':
                 break
             
         except:
-            print("Unexpected error:", sys.exc_info())
+            print("Unexpected error:", traceback.format_exc())
             break
 
     cv2.destroyAllWindows()
