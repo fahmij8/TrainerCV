@@ -1,5 +1,5 @@
 # =========== Module 1, Step 3 : Model Testing (IoT Implementation) =========== #
-import cv2, sys
+import cv2, traceback
 import tensorflow as tf
 import numpy as np
 import utilities_modul as util
@@ -63,7 +63,7 @@ if __name__ == '__main__':
                 util.give_grading(usermail=usermail, steps=4, optionalParam=detectedTimes)
                 break
         except:
-            print("Unexpected error:", sys.exc_info())
+            print("Unexpected error:", traceback.format_exc())
             break
 
     cv2.destroyAllWindows()
