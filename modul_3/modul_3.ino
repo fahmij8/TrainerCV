@@ -7,26 +7,27 @@
 #define projectName "your-project-name" // input ur antares project name on antares application 
 #define deviceName "your-project-name" // input ur antares device name on antares application
 AntaresESP32HTTP antares(ACCESSKEY);
-int ledpin = 27;
+
+#include <Wire.h> 
+#include <LiquidCrystal_I2C.h>
+
+LiquidCrystal_I2C lcd(0x27,16,2);  // set the LCD address to 0x27 for a 16 chars and 2 line display
 
 void setup() {
     Serial.begin(115200);
     antares.setDebug(true);
     antares.wifiConnection(WIFISSID, PASSWORD);
-    pinMode (ledpin, OUTPUT);
+    lcd.init();                      // initialize the lcd 
+    lcd.backlight();                 // turn on LCD backlight
 }
 
 void loop() {
   // Get the latest data from your Antares device
   antares.get(projectName, deviceName);
-    int led = antares.getInt("led");
+    String colour = antares.getString("colour");
 
-    Serial.println("led: " + (led));
-  delay(5000);
-  if (led == 1) {
-    digitalWrite (ledpin, HIGH);
-  }
-  else {
-    digitalWrite (ledpin, LOW);
-  }
+    Serial.println("colour: " + (colour));
+    lcd.setCursor (0,0);
+    lcd.print ("colour: " + (colour));
+delay (5000);
 }
